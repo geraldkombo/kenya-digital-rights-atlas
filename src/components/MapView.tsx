@@ -5,6 +5,9 @@ import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { getDRRSColor } from "@/lib/scoring";
 
+// Must match basePath in next.config.ts: the maplibre worker is served from public/.
+const BASE_PATH = "/kenya-digital-rights-atlas";
+
 interface MapViewProps {
   boundaries: GeoJSON.FeatureCollection;
   countyScores: Record<string, number>;
@@ -48,6 +51,9 @@ export default function MapView({
 
     let map: maplibregl.Map | null = null;
     try {
+      // maplibre-gl v6 needs an explicit worker URL under a bundler; the file is
+      // copied into public/ by scripts/copy-maplibre-worker.mjs during prebuild.
+      maplibregl.setWorkerUrl(`${BASE_PATH}/maplibre-gl-worker.mjs`);
       map = new maplibregl.Map({
         container: containerRef.current,
         style: {
